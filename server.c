@@ -15,17 +15,17 @@
 
 int main(int argc, char **argv)
 {
-	SDL_Window		*window;
-	SDL_Renderer	*renderer;
-	SDL_Texture		*canvas;
-	int				width = 1000;
-	int				height = 1000;
-	int				pixels[1000 * 1000];
+	SDL_Window			*window;
+	SDL_Renderer		*renderer;
+	SDL_Texture			*canvas;
+	int					width = 1000;
+	int					height = 1000;
+	int					pixels[1000 * 1000];
 
 	// SOCKETS
-	int sockfd, newsockfd, portno;
-	unsigned int	clilen;
-	struct sockaddr_in serv_addr, cli_addr;
+	int 				sockfd, newsockfd, portno;
+	unsigned int		clilen;
+	struct sockaddr_in	serv_addr, cli_addr;
 	if (argc < 2) {
 		fprintf(stderr,"ERROR, no port provided\n");
 		exit(1);
@@ -72,11 +72,11 @@ int main(int argc, char **argv)
 			width,
 			height);
 
-	SDL_Event		event;
-	int				mouse_pressed = 0;
-	int				n = 0;
-	int				ret = 0;
-	printf("FD: %d\n", sockfd);
+	SDL_Event			event;
+	int					mouse_pressed = 0;
+	int					n = 0;
+	int					ret = 0;
+	int					coords[2];
 	bzero(pixels, sizeof(pixels));
 	while (1)
 	{
@@ -97,9 +97,11 @@ int main(int argc, char **argv)
 						event.motion.x,
 						event.motion.y,
 						COLOR);
-				while (n < (int)sizeof(pixels) && ret > -1)
+				coords[0] = event.motion.x;
+				coords[1] = event.motion.y;
+				while (n < (int)sizeof(coords) && ret > -1)
 				{
-					ret = write(newsockfd, pixels + (n >> 2), sizeof(pixels) - n);
+					ret = write(newsockfd, coords + (n >> 2), sizeof(coords) - n);
 					if (ret == 0)
 						sleep(1);
 					if (ret == -1)

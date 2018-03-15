@@ -15,18 +15,18 @@
 
 int main(int argc, char **argv)
 {
-	SDL_Window		*window;
-	SDL_Renderer	*renderer;
-	SDL_Texture		*canvas;
-	int				width = 1000;
-	int				height = 1000;
-	int				pixels[1000 * 1000];
+	SDL_Window			*window;
+	SDL_Renderer		*renderer;
+	SDL_Texture			*canvas;
+	int					width = 1000;
+	int					height = 1000;
+	int					pixels[1000 * 1000];
 
 	// SOCKETS
-    int sockfd, portno;
+    int 				sockfd, portno;
 
-    struct sockaddr_in serv_addr;
-    struct hostent *server;
+    struct sockaddr_in 	serv_addr;
+    struct hostent 		*server;
 
     if (argc < 3) {
        fprintf(stderr,"usage %s hostname port\n", argv[0]);
@@ -77,11 +77,11 @@ int main(int argc, char **argv)
 			width,
 			height);
 
-	SDL_Event		event;
+	SDL_Event			event;
+	int					n = 0;
+	int					ret = 0;
+	int					coords[2];
 	bzero(pixels, sizeof(pixels));
-	printf("FD: %d\n", sockfd);
-	int	n = 0;
-	int	ret = 0;
 	while (1)
 	{
 		n = 0;
@@ -90,17 +90,24 @@ int main(int argc, char **argv)
 			if (event.type == SDL_QUIT)
 				break ;
 		}
-		while (n < (int)sizeof(pixels) && ret > -1)
+		while (n < (int)sizeof(coords) && ret > -1)
 		{
-			ret = read(sockfd, pixels + (n >> 2), sizeof(pixels) - n);
+			ret = read(sockfd, coords + (n >> 2), sizeof(coords) - n);
 			if (ret == 0)
 				sleep(1);
 			else if (ret == -1)
 				break;
 			n += ret;
 		}
-		if (ret == -1)
-			break;
+		if (ret > 0)
+		{
+			PUT_PIXEL(
+						pixels,
+						width,
+						coords[0],
+						coords[1],
+						COLOR);
+		}
 		SDL_UpdateTexture(canvas, NULL, pixels, width << 2);
 		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, canvas, NULL, NULL);
