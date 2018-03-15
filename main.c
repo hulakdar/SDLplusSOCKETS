@@ -6,7 +6,7 @@
 /*   By: ftymchyn <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/14 17:43:23 by ftymchyn          #+#    #+#             */
-/*   Updated: 2018/03/15 15:09:29 by skamoza          ###   ########.fr       */
+/*   Updated: 2018/03/15 15:49:02 by skamoza          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,23 +90,17 @@ int main(int argc, char **argv)
 			if (event.type == SDL_QUIT)
 				break ;
 		}
-		while (n < (int)sizeof(coords) && ret > -1)
-		{
-			ret = read(sockfd, coords + (n >> 2), sizeof(coords) - n);
-			if (ret == 0)
-				sleep(1);
-			else if (ret == -1)
-				break;
-			n += ret;
-		}
+		ret = read(sockfd, coords + (n >> 2), sizeof(coords) - n);
+		else if (ret < 1)
+			break;
 		if (ret > 0)
 		{
 			PUT_PIXEL(
-						pixels,
-						width,
-						coords[0],
-						coords[1],
-						COLOR);
+					pixels,
+					width,
+					coords[0],
+					coords[1],
+					COLOR);
 		}
 		SDL_UpdateTexture(canvas, NULL, pixels, width << 2);
 		SDL_RenderClear(renderer);
