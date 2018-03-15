@@ -6,7 +6,7 @@
 /*   By: ftymchyn <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/14 17:43:12 by ftymchyn          #+#    #+#             */
-/*   Updated: 2018/03/14 17:43:14 by ftymchyn         ###   ########.fr       */
+/*   Updated: 2018/03/15 13:01:26 by skamoza          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,15 @@
 # define PT_H
 
 # include <stdio.h>
-# include "SDL.h"
+# include <string.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <sys/types.h> 
+# include <sys/socket.h>
+# include <netinet/in.h>
+#include <netdb.h> 
+
+# include <SDL.h>
 
 # define COLOR	0xFFFFFF
 # define PUT_PIXEL(pixels, width, x, y, c) (pixels[y * width + x] = c)

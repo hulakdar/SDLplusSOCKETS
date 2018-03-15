@@ -23,36 +23,31 @@ int main(int argc, char **argv)
 	int				pixels[1000 * 1000];
 
 	// SOCKETS
-    int sockfd, portno;
-
-    struct sockaddr_in serv_addr;
-    struct hostent *server;
-
-    if (argc < 3) {
-       fprintf(stderr,"usage %s hostname port\n", argv[0]);
-       exit(0);
-    }
-    portno = atoi(argv[2]);
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) {
-        printf("ERROR opening socket");
-       exit(0);
-    }
-    server = gethostbyname(argv[1]);
-    if (server == NULL) {
-        fprintf(stderr,"ERROR, no such host\n");
-        exit(0);
-    }
-    bzero((char *) &serv_addr, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    bcopy((char *)server->h_addr, 
-         (char *)&serv_addr.sin_addr.s_addr,
-         server->h_length);
-    serv_addr.sin_port = htons(portno);
-    if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0)  {
-        printf("ERROR connecting");
-       exit(0);
-}
+	int sockfd, newsockfd, portno;
+	unsigned int	clilen;
+	struct sockaddr_in serv_addr, cli_addr;
+	if (argc < 2) {
+		fprintf(stderr,"ERROR, no port provided\n");
+		exit(1);
+	}
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockfd < 0) {
+		printf("ERROR opening socket");
+		exit(0);
+	}
+	bzero((char *) &serv_addr, sizeof(serv_addr));
+	portno = atoi(argv[1]);
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	serv_addr.sin_port = htons(portno);
+	if (bind(sockfd, (struct sockaddr *) &serv_addr,
+				sizeof(serv_addr)) < 0) {
+		printf("bind error");
+		exit(0);
+	}
+	listen(sockfd, 5);
+	clilen = sizeof(cli_addr);
+	newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
 
 	// SDL
 	SDL_Init(SDL_INIT_VIDEO);
@@ -78,29 +73,35 @@ int main(int argc, char **argv)
 			height);
 
 	SDL_Event		event;
-	bzero(pixels, sizeof(pixels));
+	int				mouse_pressed = 0;
+	int				n = 0;
+	int				ret = 0;
 	printf("FD: %d\n", sockfd);
-	int	n = 0;
-	int	ret = 0;
+	bzero(pixels, sizeof(pixels));
 	while (1)
 	{
-		n = 0;
 		if (SDL_PollEvent(&event))
 		{
+			n = 0;
 			if (event.type == SDL_QUIT)
 				break ;
+			else if (event.type == SDL_MOUSEBUTTONDOWN)
+				mouse_pressed = 1;
+			else if (event.type == SDL_MOUSEBUTTONUP)
+				mouse_pressed = 0;
+			else if (mouse_pressed && event.type == SDL_MOUSEMOTION)
+			{
+				PUT_PIXEL(
+						pixels,
+						width,
+						event.motion.x,
+						event.motion.y,
+						COLOR);
+				ret = write(newsockfd, pixels + n / 4, sizeof(pixels));
+				if (ret == -1)
+					break;
+			}
 		}
-		while (n < (int)sizeof(pixels) && ret > -1)
-		{
-			ret = read(sockfd, pixels + n / 4, sizeof(pixels));
-			if (ret == 0)
-				printf("read nothing\n");
-			else if (ret == -1)
-				break;
-			n += ret;
-		}
-		if (ret == -1)
-			break;
 		SDL_UpdateTexture(canvas, NULL, pixels, width << 2);
 		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, canvas, NULL, NULL);

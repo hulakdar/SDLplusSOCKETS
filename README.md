@@ -1,1 +1,1 @@
-## Simple SDL2 project for self education
+## Simple SDL2 + C sockets project for self education
