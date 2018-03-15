@@ -6,7 +6,7 @@
 /*   By: ftymchyn <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/14 17:43:23 by ftymchyn          #+#    #+#             */
-/*   Updated: 2018/03/15 15:06:44 by skamoza          ###   ########.fr       */
+/*   Updated: 2018/03/15 15:09:29 by skamoza          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 						COLOR);
 				while (n < (int)sizeof(pixels) && ret > -1)
 				{
-					ret = write(newsockfd, pixels + (n >> 2), sizeof(pixels) - (n >> 2));
+					ret = write(newsockfd, pixels + (n >> 2), sizeof(pixels) - n);
 					if (ret == 0)
 						sleep(1);
 					if (ret == -1)
