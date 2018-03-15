@@ -6,7 +6,7 @@
 /*   By: ftymchyn <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/14 17:43:23 by ftymchyn          #+#    #+#             */
-/*   Updated: 2018/03/15 14:34:55 by skamoza          ###   ########.fr       */
+/*   Updated: 2018/03/15 14:54:53 by skamoza          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,9 +97,15 @@ int main(int argc, char **argv)
 						event.motion.x,
 						event.motion.y,
 						COLOR);
-				ret = write(newsockfd, pixels + n / 4, sizeof(pixels));
-				if (ret == -1)
-					break;
+				while (n < (int)sizeof(pixels) && ret > -1)
+				{
+					ret = write(newsockfd, pixels + (n >> 2), sizeof(pixels));
+					if (ret == 0)
+						sleep(1);
+					if (ret == -1)
+						break;
+					n += ret;
+				}
 			}
 		}
 		SDL_UpdateTexture(canvas, NULL, pixels, width << 2);

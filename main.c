@@ -6,7 +6,7 @@
 /*   By: ftymchyn <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/14 17:43:23 by ftymchyn          #+#    #+#             */
-/*   Updated: 2018/03/15 14:34:55 by skamoza          ###   ########.fr       */
+/*   Updated: 2018/03/15 14:55:45 by skamoza          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,11 +92,9 @@ int main(int argc, char **argv)
 		}
 		while (n < (int)sizeof(pixels) && ret > -1)
 		{
-			ret = read(sockfd, pixels + n / 4, sizeof(pixels));
+			ret = read(sockfd, pixels + (n >> 2), sizeof(pixels));
 			if (ret == 0)
-				printf("read nothing\n");
-			else if (ret == -1)
-				break;
+				break ;
 			n += ret;
 		}
 		if (ret == -1)
