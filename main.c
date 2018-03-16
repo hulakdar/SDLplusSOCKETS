@@ -91,7 +91,7 @@ int main(int argc, char **argv)
 				break ;
 		}
 		ret = read(sockfd, coords + (n >> 2), sizeof(coords) - n);
-		else if (ret < 1)
+		if (ret < 1)
 			break;
 		if (ret > 0)
 		{
